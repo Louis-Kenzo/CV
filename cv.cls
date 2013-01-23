@@ -20,13 +20,13 @@
 
 % Other packages
 \RequirePackage[paper=a4paper,%
-                marginparsep=0.5cm,%
-                marginparwidth=2cm,%
-                lmargin=2cm,%
-                rmargin=2cm,%
-                tmargin=2cm,%
-                bmargin=4cm,%
-                footskip=1.5cm%
+                marginparsep=5mm,%
+                marginparwidth=20mm,%
+                lmargin=20mm,%
+                rmargin=20mm,%
+                tmargin=20mm,%
+                bmargin=40mm,%
+                footskip=15mm%
                 ]{geometry} % 
 \RequirePackage{layout}
 \RequirePackage{fancyhdr}           % Header and footer customization
@@ -37,20 +37,102 @@
 \RequirePackage{enumitem}           % Adjustment of list environments
 \RequirePackage{calc}               % Length calculation
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                              %
+%                                User interface                                %
+%                                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Commands for formatting educational institutions, companies, addresses, etc.
+% Address
+\newcommand{\address}[1]{\gdef\cv@address{#1}}
+
+% Phone
+\newcommand{\phone}[1]{\gdef\cv@phone{#1}}
+
+% Email
+\newcommand{\email}[1]{\gdef\cv@email{#1}}
+
+% Formatting commands
+% Emphasis
+\newcommand{\emphasis}[1]{{\bfseries #1}}
+
+% 
+\newcommand{\country}[1]{{\addfontfeatures{Letters=SmallCaps}\small#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% Position specification %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\cv@position@title}{}
+\newcommand{\cv@position@institution}{}
+\newcommand{\cv@position@institution@country}{}
+\newcommand{\cv@position@from}{}
+\newcommand{\cv@position@to}{}
+\define@key{positionoptions}{title}[]{%
+	\renewcommand{\cv@position@title}{#1}%
+}
+\define@key{positionoptions}{institution}[]{%
+	\renewcommand{\cv@position@institution}{#1}%
+}
+\define@key{positionoptions}{country}[]{%
+	\renewcommand{\cv@position@institution@country}{#1}%
+}
+\define@key{positionoptions}{from}[]{%
+	\renewcommand{\cv@position@from}{#1}%
+}
+\define@key{positionoptions}{to}[]{%
+	\renewcommand{\cv@position@to}{#1}%
+}
+\newenvironment{position}[1][]%
+{% Before
+	\setkeys{positionoptions}{#1}%
+	\emphasis{\addfontfeatures{} \cv@position@title} \hfill \@datestyle{\cv@position@from–\cv@position@to}\\%
+	{\addfontfeatures{} \itshape \cv@position@institution}, \country{\cv@position@institution@country}\\%
+}%
+{}%After
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{header}[0]{
+	\begin{cv@offsetsectionmargin}
+}{
+	\end{cv@offsetsectionmargin}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                              %
+%                                   Backend                                    %
+%                                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Page geometry %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{cv@offsetsectionmargin}[0]{%
+	\begin{adjustwidth}{-\cv@sectionwidth-\cv@sectionsep}{0mm}%
+
+}{%
+	\end{adjustwidth}%
+}
+
+\newcommand{\cv@updategeometry}[0]{%
+	\geometry{lmargin=20mm+\cv@sectionwidth+\cv@sectionsep}%
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \renewcommand\maketitle{%
-	\begingroup
-		\if@twocolumn
-			\ifnum \col@number=\@ne
-				\@maketitle
+	\begin{cv@offsetsectionmargin}
+		\begingroup
+			\if@twocolumn
+				\ifnum \col@number=\@ne
+					\@maketitle
+				\else
+					\twocolumn[\@maketitle]%
+				\fi
 			\else
-				\twocolumn[\@maketitle]%
+				\@maketitle
 			\fi
-		\else
-			\@maketitle
-		\fi
-	\endgroup
+		\endgroup
+	\end{cv@offsetsectionmargin}
 }
 
 \renewcommand{\@maketitle}[1]{%
@@ -73,6 +155,7 @@
 \AtBeginDocument{%
 	% Set the header and footer now, as this command is called from inside the document environment when meta-data like address etc. has already been set
 	\cv@setheaderfooter
+
 }
 \newcommand{\cv@setheaderfooter}[0]{%
 	\pagestyle{fancy}
@@ -80,6 +163,8 @@
 	\renewcommand{\footrulewidth}{0.0pt}
 	\fancyhead{}
 	\fancyfoot{} 
+	\fancyhfoffset[L]{ ( \cv@sectionwidth + \cv@sectionsep)/2 }
+	\fancyhfoffset[R]{ (-\cv@sectionwidth - \cv@sectionsep)/2 }
 	
 	\cfoot{%
 		\@footerstyle{%
@@ -96,11 +181,17 @@
 % User settable settings for
 \newlength{\cv@sectionwidth}
 \newlength{\cv@sectionsep}
+% Set defaults for the section dimensions, and set up the margins with them
 \setlength{\cv@sectionwidth}{25mm}
 \setlength{\cv@sectionsep}{10mm}
+\cv@updategeometry
 
-\newcommand{\sectionwidth}[1]{\setlength{\cv@sectionwidth}{#1}}
-\newcommand{\sectionsep}[1]{\setlength{\cv@sectionsep}{#1}}
+\newcommand{\sectionwidth}[1]{%
+	\setlength{\cv@sectionwidth}{#1}\cv@updategeometry%
+}
+\newcommand{\sectionsep}[1]{%
+	\setlength{\cv@sectionsep}{#1}\cv@updategeometry%
+}
 
 \newenvironment{component}[1]%
 {
@@ -147,7 +238,7 @@
 
 \newfontface \@namefont[Letters=SmallCaps]{EB Garamond 12 Regular}
 \newfontface \@dingbatfont[]{DejaVu Sans}
-\newfontface \@ornamentfont[CharacterVariant={}]{EB Garamond}
+\newfontface \@ornamentfont[]{EB Garamond}
 
 \newcommand \@headerstyle[1]{{#1}}
 \newcommand \@titlestyle[1]{{\LARGE#1}}
@@ -175,53 +266,5 @@
                   leftmargin=*,%
                   itemsep=-0.0\baselineskip%
                  }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User interface %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Commands for formatting educational institutions, companies, addresses, etc.
-% Address
-\newcommand{\address}[1]{\gdef\cv@address{#1}}
-
-% Phone
-\newcommand{\phone}[1]{\gdef\cv@phone{#1}}
-
-% Email
-\newcommand{\email}[1]{\gdef\cv@email{#1}}
-
-% Formatting commands
-% Emphasis
-\newcommand{\emphasis}[1]{{\bfseries #1}}
-
-% 
-\newcommand{\country}[1]{{\addfontfeatures{Letters=SmallCaps}\small#1}}
-
-% Position formatting
-\newcommand{\cv@position@title}{}
-\newcommand{\cv@position@institution}{}
-\newcommand{\cv@position@institution@country}{}
-\newcommand{\cv@position@from}{}
-\newcommand{\cv@position@to}{}
-\define@key{positionoptions}{title}[]{%
-	\renewcommand{\cv@position@title}{#1}%
-}
-\define@key{positionoptions}{institution}[]{%
-	\renewcommand{\cv@position@institution}{#1}%
-}
-\define@key{positionoptions}{country}[]{%
-	\renewcommand{\cv@position@institution@country}{#1}%
-}
-\define@key{positionoptions}{from}[]{%
-	\renewcommand{\cv@position@from}{#1}%
-}
-\define@key{positionoptions}{to}[]{%
-	\renewcommand{\cv@position@to}{#1}%
-}
-\newenvironment{position}[1][]%
-{% Before
-	\setkeys{positionoptions}{#1}%
-	\emphasis{\addfontfeatures{} \cv@position@title} \hfill \@datestyle{\cv@position@from–\cv@position@to}\\%
-	{\addfontfeatures{} \itshape \cv@position@institution}, \country{\cv@position@institution@country}\\%
-}%
-{}%After
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
