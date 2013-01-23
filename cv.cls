@@ -29,14 +29,13 @@
                 footskip=1.5cm%
                 ]{geometry} % 
 \RequirePackage{layout}
-\RequirePackage{fancyhdr}   % Header and footer customization
-%\RequirePackage{titling}
-%\RequirePackage[explicit]{titlesec}
-\RequirePackage{fontspec}   % Unicode and OpenType font management
-\RequirePackage{tabu}       % Improved tabular environment
-%\RequirePackage{changepage}
-\RequirePackage{enumitem}   % Adjustment of list environments
-%\RequirePackage{everypage}
+\RequirePackage{fancyhdr}           % Header and footer customization
+\RequirePackage[explicit]{titlesec} % Customization of section headers
+\RequirePackage{fontspec}           % Unicode and OpenType font management
+\RequirePackage{tabu}               % Improved tabular environment
+\RequirePackage{changepage}         % On-the-fly adjustment of margins
+\RequirePackage{enumitem}           % Adjustment of list environments
+\RequirePackage{calc}               % Length calculation
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -94,45 +93,44 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Sections %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newlength{\cv@sectiontitlewidth}
-\newlength{\cv@sectionbodywidth}
-\setlength{\cv@sectiontitlewidth}{94pt}
-\setlength{\cv@sectionbodywidth}{377pt}
+% User settable settings for
+\newlength{\cv@sectionwidth}
+\newlength{\cv@sectionsep}
+\setlength{\cv@sectionwidth}{25mm}
+\setlength{\cv@sectionsep}{10mm}
 
-\AtBeginDocument{%
-	\begin{tabu} {@{} X[1,l] X[4,l,p] @{}} 
-		\null \the\hsize \setlength{\cv@sectiontitlewidth}{\hsize} \the\cv@sectiontitlewidth 
-		&
-		\null \the\hsize \setlength{\cv@sectionbodywidth}{\hsize} \the\cv@sectionbodywidth 
-		\\
+\newcommand{\sectionwidth}[1]{\setlength{\cv@sectionwidth}{#1}}
+\newcommand{\sectionsep}[1]{\setlength{\cv@sectionsep}{#1}}
 
-		\the\cv@sectiontitlewidth 
-		&
-		\the\cv@sectionbodywidth 
-		\\
-	\end{tabu}
-	
+\newenvironment{component}[1]%
+{
+	% Save the current margins 
+	\addtolength{\oddsidemargin}{\cv@sectionwidth+\cv@sectionsep}
+	\addtolength{\hsize}{-\cv@sectionwidth-\cv@sectionsep}
+
+	% Offset the margins so that section titles printed in the margin by titlesec are properly aligned and in view
+	% TODO
+
+	% Print the section heading and setup for the section body
+	\section{#1}
+}{
+	% Now the section has been printed, let's reset the margins to what they were before
+	% TODO
+	\restoregeometry
 }
 
-\newsavebox{\cv@sectiontitle}
-\newsavebox{\cv@sectionbody}
-\newenvironment{component}[1]{
-	\begin{lrbox}{\cv@sectiontitle}
-		\begin{minipage}[t]{\cv@sectiontitlewidth}
-			\@headingstyle{#1}
-		\end{minipage}
-	\end{lrbox}
-	\begin{lrbox}{\cv@sectionbody}
-		\begin{minipage}[t]{\cv@sectionbodywidth}
-}{%
-		\end{minipage}
-	\end{lrbox}
-	\begin{tabu} {@{} X[1,l] X[4,l,p] @{}} 
-		\usebox{\cv@sectiontitle}
-		&
-		\usebox{\cv@sectionbody}
-	\end{tabu}
-}
+\titleformat{\section}           % 
+            [leftmargin]         % 
+            {\null}              % Section formating
+            {}                   % Section label
+            {0mm}                % Separator before
+            {\@headingstyle{#1}} % Section title
+            []                   % After
+
+\titlespacing{\section}         % 
+             {\cv@sectionwidth} % Section width
+             {0mm}              % Vertical space before title
+             {\cv@sectionsep}   % Horizontal separation with text
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fonts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
