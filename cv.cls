@@ -3,6 +3,8 @@
 %                           Louis-Kenzo Furuya-Cahier                          %
 %                                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% TODO Skill strength using varying bullet size
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Identification %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -24,7 +26,7 @@
                 marginparwidth=20mm,%
                 lmargin=20mm,%
                 rmargin=20mm,%
-                tmargin=20mm,%
+                tmargin=15mm,%
                 bmargin=40mm,%
                 footskip=15mm%
                 ]{geometry} % 
@@ -36,6 +38,7 @@
 \RequirePackage{changepage}         % On-the-fly adjustment of margins
 \RequirePackage{enumitem}           % Adjustment of list environments
 \RequirePackage{calc}               % Length calculation
+\RequirePackage{marvosym}           % Phone symbols
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                              %
@@ -45,17 +48,25 @@
 
 % Commands for formatting educational institutions, companies, addresses, etc.
 % Address
+\newcommand{\cv@address}{\null}
 \newcommand{\address}[1]{\gdef\cv@address{#1}}
 
 % Phone
-\newcommand{\phone}[1]{\gdef\cv@phone{#1}}
+\newcommand{\cv@landline}{\null}
+\newcommand{\landline}[1]{\gdef\cv@landline{#1}}
+\newcommand{\cv@mobilephone}{\null}
+\newcommand{\mobilephone}[1]{\gdef\cv@mobilephone{#1}}
 
 % Email
+\newcommand{\cv@email}{\null}
 \newcommand{\email}[1]{\gdef\cv@email{#1}}
 
 % Formatting commands
 % Emphasis
 \newcommand{\emphasis}[1]{{\bfseries #1}}
+
+% Synopsize
+\newcommand{\synopsize}[1]{\emph{#1}}
 
 % 
 \newcommand{\country}[1]{{\addfontfeatures{Letters=SmallCaps}\small#1}}
@@ -138,16 +149,16 @@
 \renewcommand{\@maketitle}[1]{%
 	\begin{center}
 		\begin{tabu} {@{} X[1,l,b] @{} X[3,c,b] @{} X[1,r,m] @{}}
-			{\footnotesize January 21{\addfontfeatures{VerticalPosition=Ordinal}st} 2013}
+			%{\footnotesize January 21{\addfontfeatures{VerticalPosition=Ordinal}st} 2013}
 			& 
 			\@titlestyle{\@namestyle{}{Louis-Kenzo} {\addfontfeatures{Letters=SmallCaps} Furuya Cahier}} %
 			& 
-			{\footnotesize French, Japanese citizen}
+			%{\footnotesize French, Japanese citizen}
 		\end{tabu}
 		\vskip .1em
 		\hrulefill
 	\end{center}
-	\vskip 1.3em
+	\vskip 1.1em
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Header and footer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,8 +181,13 @@
 		\@footerstyle{%
 			{\large \@ornamentstyle{☙\hspace{0.05em}❧}} \\% ☙❦❧ \char"E001 \char"E002
 			\vskip 0.8em
+			%{\@emailstyle{www.louis-kenzo.com}}\\
 			\@addressstyle{\cv@address}\\%
-			\@dingbatstyle{☎} \@phonestyle{\cv@phone} \hspace{0.5em} \@dingbatstyle{✉} \@emailstyle{\cv@email}%
+			\Mobilefone \hspace{0.1em} \@phonestyle{\cv@mobilephone} 
+			\hspace{0.4em} 
+			{\raise-.30ex\hbox{\large\@dingbatstyle{✉}}} \@emailstyle{\cv@email}
+			\hspace{0.4em}
+			{\raise-.25ex\hbox{\@dingbatstyle{☎}}} \@phonestyle{\cv@landline}%
 		}%
 	}
 }
@@ -218,10 +234,10 @@
             {\@headingstyle{#1}} % Section title
             []                   % After
 
-\titlespacing{\section}         % 
-             {\cv@sectionwidth} % Section width
-             {0mm}              % Vertical space before title
-             {\cv@sectionsep}   % Horizontal separation with text
+\titlespacing{\section}          % 
+             {\cv@sectionwidth}  % Section width
+             {-0.2\baselineskip} % Vertical space before title
+             {\cv@sectionsep}    % Horizontal separation with text
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fonts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -255,7 +271,7 @@
 \newcommand \@dingbatstyle[1]{{\@dingbatfont#1}}
 \newcommand \@ornamentstyle[1]{{\@ornamentfont#1}}
 \newcommand \@phonestyle[1]{{#1}}
-\newcommand \@emailstyle[1]{{\fontspec{EB Garamond 12 Regular}#1}}
+\newcommand \@emailstyle[1]{{#1}}
 \newcommand \@datestyle[1]{{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Formatting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
