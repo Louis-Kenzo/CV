@@ -337,8 +337,7 @@
 	\renewcommand{\footrulewidth}{0.0pt}
 	\fancyhead{}
 	\fancyfoot{} 
-	\fancyhfoffset[L]{ ( \cv@sectionwidth + \cv@sectionsep)/2 }
-	\fancyhfoffset[R]{ (-\cv@sectionwidth - \cv@sectionsep)/2 }
+	\fancyhfoffset[L]{\cv@sectionwidth + \cv@sectionsep}
 	
 	\cfoot{%
 		\@footerstyle{%
